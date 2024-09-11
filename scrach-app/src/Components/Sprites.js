@@ -25,7 +25,6 @@ const Sprites = ({
 
   const handleCharacterSelect = (characters) => {
     setSelectedCharcter([...selectedCharcter, characters]);
-    console.log(selectedCharcter, "abc");
     setIsModalOpen(false);
   };
 

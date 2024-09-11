@@ -6,10 +6,9 @@ const EditArea = ({ playRotation, setCoords }) => {
   const [droppedMotion, setDroppedMotion] = useState([]);
   const [count, setCount] = useState(15);
 
-  // Define the drop target behavior
   const [{ isOver }, drop] = useDrop({
     accept: "item",
-    drop: useCallback((item) => handleMotionDrop(item), []),
+    drop: (item) => handleMotionDrop(item),
     collect: (monitor) => ({
       isOver: monitor.isOver(),
     }),
