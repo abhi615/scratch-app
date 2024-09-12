@@ -7,13 +7,58 @@ import Spirites from "./Components/Sprites";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import defaultImage from "../src/assets/images/cat-sprite.svg";
+import secondImage from "../src/assets/images/ballon.svg";
 
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCharcter, setSelectedCharcter] = useState([defaultImage]);
+  const [selectedCharcter, setSelectedCharcter] = useState([
+    defaultImage,
+    secondImage,
+  ]);
   const [spriteRotation, setSpriteRotation] = useState(0);
   const [spriteIndex, setSpriteIndex] = useState(0);
   const [coords, setCoords] = useState({ xPos: 0, yPos: 0 });
+  const [positionsAndMovements, setPositionsAndMovements] = useState([
+    { xPos: 0, yPos: 0, moveX: 10, width: 50, height: 50 },
+    { xPos: 100, yPos: 0, moveX: -10, width: 50, height: 50 }, // For Character 2
+  ]);
+
+  const detectCollision = useCallback((char1, char2) => {
+    const buffer = 2;
+    return (
+      char1.xPos + char1.width >= char2.xPos - buffer &&
+      char1.xPos <= char2.xPos + char2.width + buffer &&
+      char1.yPos + char1.height >= char2.yPos - buffer &&
+      char1.yPos <= char2.yPos + char2.height + buffer
+    );
+  }, []);
+
+  // Handle movements and swap on collision
+  const handlePlay = useCallback(() => {
+    setPositionsAndMovements((prev) => {
+      // Update character positions
+      const updatedChars = prev.map((char) => ({
+        ...char,
+        xPos: char.xPos + char.moveX,
+      }));
+
+      // Detect collision between the two characters
+      if (detectCollision(updatedChars[0], updatedChars[1])) {
+        console.log("Collision detected - swapping movements!");
+
+        // Swap movements between Character 1 and Character 2
+        const char1MoveX = updatedChars[0].moveX;
+        const char2MoveX = updatedChars[1].moveX;
+
+        return updatedChars.map((char, index) => ({
+          ...char,
+          moveX: index === 0 ? char2MoveX : char1MoveX, // Swap moveX between characters
+        }));
+      }
+
+      return updatedChars;
+    });
+  }, [detectCollision]);
 
   const onDragUpdate = useCallback((event, dragData) => {
     setCoords({ xPos: dragData.x, yPos: dragData.y });
@@ -25,7 +70,6 @@ function App() {
         const adjustmentDirection = direction === "left" ? -1 : 1;
         return prevRotation + adjustmentDirection * inputValue * stepSize;
       });
-
       setSpriteIndex((prevIndex) => {
         if (selectedCharcter.length === 0) return prevIndex;
         const newIndex =
@@ -53,6 +97,8 @@ function App() {
               playRotation={playRotation}
               coords={coords}
               setCoords={setCoords}
+              setSelectedCharcter={setSelectedCharcter}
+              handlePlay={handlePlay}
             />
           </div>
         </DndProvider>
@@ -65,6 +111,7 @@ function App() {
               spriteIndex={spriteIndex}
               onDragUpdate={onDragUpdate}
               coords={coords}
+              positionsAndMovements={positionsAndMovements}
             />
           </div>
 
