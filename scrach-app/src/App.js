@@ -33,26 +33,25 @@ function App() {
     );
   }, []);
 
-  // Handle movements and swap on collision
   const handlePlay = useCallback(() => {
     setPositionsAndMovements((prev) => {
-      // Update character positions
+  
       const updatedChars = prev.map((char) => ({
         ...char,
         xPos: char.xPos + char.moveX,
       }));
 
-      // Detect collision between the two characters
+     
       if (detectCollision(updatedChars[0], updatedChars[1])) {
         console.log("Collision detected - swapping movements!");
 
-        // Swap movements between Character 1 and Character 2
+       
         const char1MoveX = updatedChars[0].moveX;
         const char2MoveX = updatedChars[1].moveX;
 
         return updatedChars.map((char, index) => ({
           ...char,
-          moveX: index === 0 ? char2MoveX : char1MoveX, // Swap moveX between characters
+          moveX: index === 0 ? char2MoveX : char1MoveX, 
         }));
       }
 
